@@ -33,6 +33,7 @@ jobs:
           python3 - <<'PY'
           import json
           import os
+          from pathlib import Path
 
           ga_id = os.environ.get("GA_MEASUREMENT_ID", "").strip()
           config = {"analytics": {}}
@@ -42,6 +43,15 @@ jobs:
           with open("config.json", "w", encoding="utf-8") as file:
               json.dump(config, file, indent=2)
               file.write("\n")
+
+          if ga_id:
+              index = Path("index.html")
+              html = index.read_text(encoding="utf-8")
+              marker = "    <title>Holocron Quiz</title>"
+              meta = '    <meta name="holocron-config" content="./config.json" />'
+              if meta not in html:
+                  html = html.replace(marker, f"{meta}\n{marker}", 1)
+                  index.write_text(html, encoding="utf-8")
           PY
 
       - name: Configure Pages

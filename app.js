@@ -17,6 +17,8 @@
     questionMeta: document.getElementById("questionMeta"),
     questionText: document.getElementById("questionText"),
     scoreValue: document.getElementById("scoreValue"),
+    topProgressValue: document.getElementById("topProgressValue"),
+    topProgressBar: document.getElementById("topProgressBar"),
     progressValue: document.getElementById("progressValue"),
     streakValue: document.getElementById("streakValue"),
     accuracyValue: document.getElementById("accuracyValue"),
@@ -36,13 +38,15 @@
     nextButton: document.getElementById("nextButton"),
     resetButton: document.getElementById("resetButton"),
     categoryFilter: document.getElementById("categoryFilter"),
+    categoryButtons: document.getElementById("categoryButtons"),
     difficultyFilter: document.getElementById("difficultyFilter"),
     clearFiltersButton: document.getElementById("clearFiltersButton"),
     questionMap: document.getElementById("questionMap"),
     analyticsStatus: document.getElementById("analyticsStatus"),
     monthlyVisits: document.getElementById("monthlyVisits"),
     completedRuns: document.getElementById("completedRuns"),
-    bestScore: document.getElementById("bestScore")
+    bestScore: document.getElementById("bestScore"),
+    analyticsStatusLabel: document.getElementById("analyticsStatusLabel")
   };
 
   bootstrap();
@@ -53,6 +57,7 @@
     const gaId = initGoogleAnalytics();
     if (gaId) {
       els.analyticsStatus.textContent = "GA4";
+      els.analyticsStatusLabel.textContent = "GA4";
     }
 
     fillFilters();
@@ -87,12 +92,15 @@
     els.questionText.textContent = question.prompt;
     els.scoreValue.textContent = score;
     els.progressValue.textContent = `${state.index + 1}/${questions.length}`;
+    els.topProgressValue.textContent = `${state.index + 1}/${questions.length}`;
+    els.topProgressBar.style.width = `${Math.max(5, Math.round(((state.index + 1) / questions.length) * 100))}%`;
     els.streakValue.textContent = state.streak;
     els.accuracyValue.textContent = `${accuracy}%`;
     els.answeredCount.textContent = `${answered} answered`;
     els.bestScore.textContent = String(state.bestScore);
     els.previousButton.disabled = state.index === 0;
     els.nextButton.textContent = state.index === questions.length - 1 ? "Finish" : "Next";
+    syncCategoryButtons();
 
     renderAnswers(question, answer);
     renderFeedback(question, answer);
@@ -270,15 +278,41 @@
   }
 
   function fillFilters() {
+    const categoryIcons = {
+      all: "✦",
+      characters: "◇",
+      worlds: "◌",
+      vehicles: "⌁",
+      stories: "▣",
+      force: "⌬",
+      species: "◍"
+    };
     const option = document.createElement("option");
     option.value = "all";
     option.textContent = "All categories";
     els.categoryFilter.appendChild(option);
+    els.categoryButtons.appendChild(createCategoryButton("all", "All", categoryIcons.all));
     Object.entries(CATEGORIES).forEach(([value, label]) => {
       const categoryOption = document.createElement("option");
       categoryOption.value = value;
       categoryOption.textContent = label;
       els.categoryFilter.appendChild(categoryOption);
+      els.categoryButtons.appendChild(createCategoryButton(value, shortCategoryLabel(label), categoryIcons[value]));
+    });
+  }
+
+  function createCategoryButton(value, label, icon) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.category = value;
+    button.setAttribute("aria-pressed", String(value === state.category));
+    button.innerHTML = `<span aria-hidden="true">${icon}</span>${label}`;
+    return button;
+  }
+
+  function syncCategoryButtons() {
+    els.categoryButtons.querySelectorAll("button[data-category]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.category === state.category));
     });
   }
 
@@ -309,6 +343,14 @@
       state.index = 0;
       render();
     });
+    els.categoryButtons.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-category]");
+      if (!button) return;
+      state.category = button.dataset.category;
+      els.categoryFilter.value = state.category;
+      state.index = 0;
+      render();
+    });
     els.difficultyFilter.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-difficulty]");
       if (!button) return;
@@ -323,6 +365,7 @@
       state.category = "all";
       state.difficulty = "all";
       els.categoryFilter.value = "all";
+      syncCategoryButtons();
       els.difficultyFilter.querySelectorAll("button").forEach((item) => {
         item.setAttribute("aria-pressed", String(item.dataset.difficulty === "all"));
       });
@@ -353,8 +396,10 @@
   }
 
   async function loadRuntimeConfig() {
+    const configUrl = document.querySelector('meta[name="holocron-config"]')?.content;
+    if (!configUrl) return {};
     try {
-      const response = await fetch("./config.json", {
+      const response = await fetch(configUrl, {
         cache: "no-store"
       });
       if (!response.ok) return {};
@@ -426,5 +471,9 @@
 
   function titleCase(value) {
     return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+  }
+
+  function shortCategoryLabel(label) {
+    return label.replace(" & Places", "").replace("Starships & ", "").replace("Films & ", "");
   }
 })();

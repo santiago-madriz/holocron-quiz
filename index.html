@@ -8,7 +8,8 @@
       content="A dark themed Star Wars fan quiz powered by Wookieepedia images and sources."
     />
     <title>Holocron Quiz</title>
-    <link rel="stylesheet" href="./styles.css?v=3" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='48' height='48' x='8' y='8' rx='8' fill='%23030305' stroke='%23ff453a' stroke-width='4'/%3E%3Cpath fill='%23ffb13d' d='M21 20h7v10h8V20h7v24h-7V34h-8v10h-7z'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
   </head>
   <body>
     <div class="starfield" aria-hidden="true"></div>
@@ -20,11 +21,11 @@
           <small>Star Wars fan challenge</small>
         </span>
       </a>
-      <nav class="topnav" aria-label="Primary">
-        <a href="#quiz">Quiz</a>
-        <a href="#progress">Progress</a>
-        <a href="#metrics">Metrics</a>
-      </nav>
+      <div class="header-progress" aria-label="Quiz progress">
+        <span>Progress</span>
+        <strong id="topProgressValue">1/120</strong>
+        <div class="progress-track"><i id="topProgressBar"></i></div>
+      </div>
       <div class="top-status" aria-live="polite">
         <span id="wikiStatus">Wiki standby</span>
         <span id="visitorPill">Monthly visits: 0</span>
@@ -34,33 +35,30 @@
     <main>
       <section class="quiz-shell" id="quiz" aria-labelledby="questionText">
         <div class="question-stage">
-          <div class="stage-header">
-            <div>
+          <div class="stage-content">
+            <div class="media-column">
               <p class="section-label" id="questionMeta">Question 1 of 120</p>
-              <h1 id="questionText">Loading question...</h1>
+              <figure class="wiki-frame">
+                <div class="image-wrap">
+                  <img id="wikiImage" alt="" referrerpolicy="no-referrer" />
+                  <div class="image-fallback" id="imageFallback" aria-hidden="true">
+                    <span>Holocron signal</span>
+                  </div>
+                </div>
+                <figcaption>
+                  <a id="wikiSource" href="https://starwars.fandom.com/wiki/Wookieepedia" target="_blank" rel="noreferrer">
+                    Source: Wookieepedia
+                  </a>
+                  <span id="wikiExtract">Loading source note...</span>
+                </figcaption>
+              </figure>
             </div>
-            <div class="score-orbit" aria-label="Current score">
-              <span id="scoreValue">0</span>
-              <small>score</small>
+
+            <div class="question-column">
+              <h1 id="questionText">Loading question...</h1>
+              <div class="answer-grid" id="answerGrid" role="list"></div>
             </div>
           </div>
-
-          <figure class="wiki-frame">
-            <div class="image-wrap">
-              <img id="wikiImage" alt="" referrerpolicy="no-referrer" />
-              <div class="image-fallback" id="imageFallback" aria-hidden="true">
-                <span>Holocron signal</span>
-              </div>
-            </div>
-            <figcaption>
-              <a id="wikiSource" href="https://starwars.fandom.com/wiki/Wookieepedia" target="_blank" rel="noreferrer">
-                Source: Wookieepedia
-              </a>
-              <span id="wikiExtract">Loading source note...</span>
-            </figcaption>
-          </figure>
-
-          <div class="answer-grid" id="answerGrid" role="list"></div>
 
           <div class="feedback-panel" id="feedbackPanel" hidden>
             <div>
@@ -77,20 +75,20 @@
         </div>
 
         <aside class="control-deck" aria-label="Quiz controls">
-          <section class="panel compact">
-            <div class="metric-row">
+          <section class="panel score-panel">
+            <div class="score-card">
               <div>
-                <span class="metric-value" id="progressValue">1/120</span>
-                <small>Progress</small>
+                <small>Score</small>
+                <span id="scoreValue">0</span>
               </div>
+              <p>Points</p>
+            </div>
+            <div class="score-card streak-card">
               <div>
-                <span class="metric-value" id="streakValue">0</span>
                 <small>Streak</small>
+                <span id="streakValue">0</span>
               </div>
-              <div>
-                <span class="metric-value" id="accuracyValue">0%</span>
-                <small>Accuracy</small>
-              </div>
+              <p>Questions</p>
             </div>
           </section>
 
@@ -101,7 +99,8 @@
             </div>
             <div class="control-group">
               <label for="categoryFilter">Category</label>
-              <select id="categoryFilter"></select>
+              <select class="sr-only" id="categoryFilter"></select>
+              <div class="category-grid" id="categoryButtons" role="group" aria-label="Category filter"></div>
             </div>
             <div class="control-group">
               <label>Difficulty</label>
@@ -122,27 +121,64 @@
             <div class="question-map" id="questionMap"></div>
           </section>
 
-          <section class="panel" id="metrics" aria-labelledby="metricsTitle">
-            <div class="panel-title">
-              <h2 id="metricsTitle">Metrics</h2>
-              <span id="analyticsStatus">Local</span>
-            </div>
-            <div class="metric-list">
-              <div>
-                <span id="monthlyVisits">0</span>
-                <small>This browser / month</small>
-              </div>
-              <div>
-                <span id="completedRuns">0</span>
-                <small>Completed runs</small>
-              </div>
-              <div>
-                <span id="bestScore">0</span>
-                <small>Best score</small>
-              </div>
-            </div>
-          </section>
+          <span class="sr-only" id="analyticsStatus">Local</span>
         </aside>
+
+        <section class="archive-band" aria-label="Quiz archive and performance">
+          <div class="archive-card leaderboard-card">
+            <div class="archive-heading">
+              <span class="archive-icon">1</span>
+              <div>
+                <h2>Top Jedi Archives</h2>
+                <small>This Month</small>
+              </div>
+            </div>
+            <ol>
+              <li><span>HolocronRunner</span><strong>6,420</strong></li>
+              <li><span>PadawanPrime</span><strong>5,580</strong></li>
+            </ol>
+          </div>
+          <div class="archive-card performance-card">
+            <h2>Your Performance</h2>
+            <div class="sparkline" aria-hidden="true">
+              <span style="height: 20%"></span>
+              <span style="height: 38%"></span>
+              <span style="height: 34%"></span>
+              <span style="height: 52%"></span>
+              <span style="height: 46%"></span>
+              <span style="height: 72%"></span>
+              <span style="height: 88%"></span>
+            </div>
+            <div class="performance-metrics">
+              <div><span id="progressValue">1/120</span><small>Progress</small></div>
+              <div><span id="accuracyValue">0%</span><small>Accuracy</small></div>
+            </div>
+          </div>
+          <div class="archive-card breakdown-card">
+            <h2>Category Breakdown</h2>
+            <div class="donut" aria-hidden="true"></div>
+            <p>Characters 58% · Worlds 16% · Ships 12%</p>
+          </div>
+          <div class="archive-card achievements-card">
+            <div class="archive-title-row">
+              <h2>Recent Achievements</h2>
+              <span id="analyticsStatusLabel">Local</span>
+            </div>
+            <div class="achievement-row">
+              <span>5</span>
+              <p><strong>Lightsaber Duelist</strong><small>Answer 5 in a row correctly</small></p>
+            </div>
+            <div class="achievement-row blue">
+              <span>25</span>
+              <p><strong>Clone Wars Veteran</strong><small>Answer 25 Clone Wars questions</small></p>
+            </div>
+            <div class="site-metrics">
+              <div><span id="monthlyVisits">0</span><small>Visits / month</small></div>
+              <div><span id="completedRuns">0</span><small>Runs</small></div>
+              <div><span id="bestScore">0</span><small>Best</small></div>
+            </div>
+          </div>
+        </section>
       </section>
     </main>
 

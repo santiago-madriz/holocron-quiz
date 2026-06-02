@@ -18,7 +18,7 @@ Each quiz question includes a `wikiTitle`. The app calls Wookieepedia's MediaWik
 
 The page always tracks local monthly visits in the visitor's browser. For global monthly visitors, configure GA4 through deploy-time runtime config instead of editing committed source files.
 
-For local development, copy `config.example.json` to `config.json` and add a GA4 Measurement ID there. `config.json` is ignored by git.
+For local development, copy `config.example.json` to `config.json`, add a GA4 Measurement ID there, and temporarily add this meta tag to `index.html`. Do not commit either local change.
 
 ```json
 {
@@ -26,6 +26,10 @@ For local development, copy `config.example.json` to `config.json` and add a GA4
     "gaMeasurementId": "G-..."
   }
 }
+```
+
+```html
+<meta name="holocron-config" content="./config.json" />
 ```
 
 For GitHub Pages deployments, set a repository variable named `GA_MEASUREMENT_ID`. The Pages workflow generates `config.json` at deploy time.
