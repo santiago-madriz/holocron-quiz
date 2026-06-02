@@ -16,12 +16,22 @@ Each quiz question includes a `wikiTitle`. The app calls Wookieepedia's MediaWik
 
 ## Analytics
 
-The page always tracks local monthly visits in the visitor's browser. For global monthly visitors, add a GA4 Measurement ID in `index.html`:
+The page always tracks local monthly visits in the visitor's browser. For global monthly visitors, configure GA4 through deploy-time runtime config instead of editing committed source files.
 
-```js
-window.HOLOCRON_CONFIG = {
-  gaMeasurementId: "G-XXXXXXXXXX"
-};
+For local development, copy `config.example.json` to `config.json` and add a GA4 Measurement ID there. `config.json` is ignored by git.
+
+```json
+{
+  "analytics": {
+    "gaMeasurementId": "G-..."
+  }
+}
 ```
 
+For GitHub Pages deployments, set a repository variable named `GA_MEASUREMENT_ID`. The Pages workflow generates `config.json` at deploy time.
+
 The app emits `page_view`, `quiz_view`, `question_answered`, `quiz_reset`, and `quiz_completed` events when GA4 is configured.
+
+## Secret Safety
+
+This is a static client app, so shipped config is visible to visitors. Do not put real secrets in `config.json`, `.env`, source files, or GitHub Pages artifacts. See `SECURITY.md` for the repo rules and scan command.

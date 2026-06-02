@@ -10,6 +10,8 @@
     streak: Number(localStorage.getItem("holocron.streak") || 0),
     bestScore: Number(localStorage.getItem("holocron.bestScore") || 0)
   };
+  let metrics = {};
+  let runtimeConfig = {};
 
   const els = {
     questionMeta: document.getElementById("questionMeta"),
@@ -43,16 +45,21 @@
     bestScore: document.getElementById("bestScore")
   };
 
-  const metrics = initMetrics();
-  const gaId = initGoogleAnalytics();
-  if (gaId) {
-    els.analyticsStatus.textContent = "GA4";
-  }
+  bootstrap();
 
-  fillFilters();
-  bindEvents();
-  render();
-  track("quiz_view", { question_count: QUESTIONS.length });
+  async function bootstrap() {
+    runtimeConfig = await loadRuntimeConfig();
+    metrics = initMetrics();
+    const gaId = initGoogleAnalytics();
+    if (gaId) {
+      els.analyticsStatus.textContent = "GA4";
+    }
+
+    fillFilters();
+    bindEvents();
+    render();
+    track("quiz_view", { question_count: QUESTIONS.length });
+  }
 
   function filteredQuestions() {
     return QUESTIONS.filter((question) => {
@@ -345,13 +352,23 @@
     return stored;
   }
 
+  async function loadRuntimeConfig() {
+    try {
+      const response = await fetch("./config.json", {
+        cache: "no-store"
+      });
+      if (!response.ok) return {};
+      const config = await response.json();
+      return typeof config === "object" && config ? config : {};
+    } catch {
+      return {};
+    }
+  }
+
   function initGoogleAnalytics() {
-    const queryId = new URLSearchParams(window.location.search).get("ga");
-    const configuredId = window.HOLOCRON_CONFIG?.gaMeasurementId || "";
-    const storedId = localStorage.getItem("holocron.gaMeasurementId") || "";
-    const id = sanitizeGaId(queryId || configuredId || storedId);
+    const configuredId = runtimeConfig.analytics?.gaMeasurementId || "";
+    const id = sanitizeGaId(configuredId);
     if (!id) return "";
-    localStorage.setItem("holocron.gaMeasurementId", id);
 
     window.dataLayer = window.dataLayer || [];
     window.gtag = function gtag() {

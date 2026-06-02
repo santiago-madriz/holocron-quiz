@@ -1,0 +1,17 @@
+.DS_Store
+node_modules/
+
+# Local and deploy-time configuration. Do not commit real values.
+.env
+.env.*
+!.env.example
+config.json
+config.local.json
+
+# Private key material should never live in this static repo.
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519
