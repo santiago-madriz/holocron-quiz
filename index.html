@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A dark themed Star Wars fan quiz powered by Wookieepedia images and sources."
+    />
+    <title>Holocron Quiz</title>
+    <link rel="stylesheet" href="./styles.css?v=3" />
+  </head>
+  <body>
+    <div class="starfield" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="#quiz" aria-label="Holocron Quiz home">
+        <span class="brand-mark">H</span>
+        <span>
+          <strong>Holocron Quiz</strong>
+          <small>Star Wars fan challenge</small>
+        </span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="#quiz">Quiz</a>
+        <a href="#progress">Progress</a>
+        <a href="#metrics">Metrics</a>
+      </nav>
+      <div class="top-status" aria-live="polite">
+        <span id="wikiStatus">Wiki standby</span>
+        <span id="visitorPill">Monthly visits: 0</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="quiz-shell" id="quiz" aria-labelledby="questionText">
+        <div class="question-stage">
+          <div class="stage-header">
+            <div>
+              <p class="section-label" id="questionMeta">Question 1 of 120</p>
+              <h1 id="questionText">Loading question...</h1>
+            </div>
+            <div class="score-orbit" aria-label="Current score">
+              <span id="scoreValue">0</span>
+              <small>score</small>
+            </div>
+          </div>
+
+          <figure class="wiki-frame">
+            <div class="image-wrap">
+              <img id="wikiImage" alt="" referrerpolicy="no-referrer" />
+              <div class="image-fallback" id="imageFallback" aria-hidden="true">
+                <span>Holocron signal</span>
+              </div>
+            </div>
+            <figcaption>
+              <a id="wikiSource" href="https://starwars.fandom.com/wiki/Wookieepedia" target="_blank" rel="noreferrer">
+                Source: Wookieepedia
+              </a>
+              <span id="wikiExtract">Loading source note...</span>
+            </figcaption>
+          </figure>
+
+          <div class="answer-grid" id="answerGrid" role="list"></div>
+
+          <div class="feedback-panel" id="feedbackPanel" hidden>
+            <div>
+              <p id="feedbackResult">Awaiting answer</p>
+              <span id="feedbackExplanation"></span>
+            </div>
+          </div>
+
+          <div class="quiz-actions">
+            <button class="ghost-button" id="previousButton" type="button">Previous</button>
+            <button class="ghost-button" id="resetButton" type="button">Reset</button>
+            <button class="primary-button" id="nextButton" type="button">Next</button>
+          </div>
+        </div>
+
+        <aside class="control-deck" aria-label="Quiz controls">
+          <section class="panel compact">
+            <div class="metric-row">
+              <div>
+                <span class="metric-value" id="progressValue">1/120</span>
+                <small>Progress</small>
+              </div>
+              <div>
+                <span class="metric-value" id="streakValue">0</span>
+                <small>Streak</small>
+              </div>
+              <div>
+                <span class="metric-value" id="accuracyValue">0%</span>
+                <small>Accuracy</small>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="filtersTitle">
+            <div class="panel-title">
+              <h2 id="filtersTitle">Filters</h2>
+              <button class="icon-button" id="clearFiltersButton" type="button" aria-label="Clear filters">×</button>
+            </div>
+            <div class="control-group">
+              <label for="categoryFilter">Category</label>
+              <select id="categoryFilter"></select>
+            </div>
+            <div class="control-group">
+              <label>Difficulty</label>
+              <div class="segmented" id="difficultyFilter" role="group" aria-label="Difficulty filter">
+                <button type="button" data-difficulty="all" aria-pressed="true">All</button>
+                <button type="button" data-difficulty="easy">Easy</button>
+                <button type="button" data-difficulty="medium">Med</button>
+                <button type="button" data-difficulty="hard">Hard</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="progress" aria-labelledby="navTitle">
+            <div class="panel-title">
+              <h2 id="navTitle">Navigator</h2>
+              <span id="answeredCount">0 answered</span>
+            </div>
+            <div class="question-map" id="questionMap"></div>
+          </section>
+
+          <section class="panel" id="metrics" aria-labelledby="metricsTitle">
+            <div class="panel-title">
+              <h2 id="metricsTitle">Metrics</h2>
+              <span id="analyticsStatus">Local</span>
+            </div>
+            <div class="metric-list">
+              <div>
+                <span id="monthlyVisits">0</span>
+                <small>This browser / month</small>
+              </div>
+              <div>
+                <span id="completedRuns">0</span>
+                <small>Completed runs</small>
+              </div>
+              <div>
+                <span id="bestScore">0</span>
+                <small>Best score</small>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <template id="answerTemplate">
+      <button class="answer-card" type="button">
+        <span class="answer-letter"></span>
+        <span class="answer-text"></span>
+      </button>
+    </template>
+
+    <script>
+      window.HOLOCRON_CONFIG = {
+        gaMeasurementId: ""
+      };
+    </script>
+    <script src="./quiz-data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
